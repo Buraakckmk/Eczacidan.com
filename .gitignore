@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.db
+
+# Node / JS
+node_modules/
+frontend-web/node_modules/
+frontend-mobile/node_modules/
+frontend-web/dist/
+frontend-web/tsconfig.tsbuildinfo
+frontend-web/tsconfig.node.tsbuildinfo
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db

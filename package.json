@@ -1,0 +1,12 @@
+{
+  "name": "eczacidan-monorepo",
+  "private": true,
+  "workspaces": [
+    "frontend-web",
+    "frontend-mobile"
+  ],
+  "scripts": {
+    "dev:web": "npm --prefix frontend-web run dev",
+    "dev:mobile": "cd frontend-mobile && npx expo start"
+  }
+}

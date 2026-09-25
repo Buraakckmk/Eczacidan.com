@@ -1,0 +1,12 @@
+# Eczacıdan.com Robots.txt
+User-agent: *
+Allow: /
+Allow: /hakkimizda
+Allow: /nasil-calisir
+Allow: /avantajlar
+Allow: /sss
+Disallow: /account
+Disallow: /cart
+Disallow: /api/
+
+Sitemap: https://eczacidan.com/sitemap.xml
