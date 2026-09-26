@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { api } from '../services/api';
 
 interface TicketMessage {
   id: string;
@@ -102,7 +103,6 @@ export default function AdminPanel() {
   const [usernameInput, setUsernameInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [loginError, setLoginError] = useState('');
-
   // Active Tab: 'chat' | 'gln_approvals' | 'listings_approval'
   const [activeTab, setActiveTab] = useState<'chat' | 'gln_approvals' | 'listings_approval'>('chat');
 
@@ -270,35 +270,18 @@ export default function AdminPanel() {
     }
   };
 
-  // LOGIN HANDLER
-  // Kimlik bilgileri YALNIZCA build zamanında env'den gelir.
-  // .env.local dosyasına VITE_ADMIN_USER ve VITE_ADMIN_PASS ekleyin.
-  // Bu değişkenler bundle'a derlenir; dolayısıyla güçlü, benzersiz değerler kullanın
-  // ve .env.local dosyasını .gitignore'da tutun.
-  const handleLogin = (e: React.FormEvent) => {
+  // LOGIN HANDLER — kimlik doğrulama tamamen backend'de yapılır,
+  // hiçbir şifre veya kullanıcı adı frontend bundle'ına derlenmez.
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    const ADMIN_USER = import.meta.env.VITE_ADMIN_USER as string | undefined;
-    const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS as string | undefined;
-
-    // Her iki env değişkeni de tanımlı değilse panel tamamen erişilemez olur.
-    if (!ADMIN_USER || !ADMIN_PASS) {
-      setLoginError(
-        'Yönetici paneli yapılandırılmamış. ' +
-        'Lütfen VITE_ADMIN_USER ve VITE_ADMIN_PASS ortam değişkenlerini tanımlayın.'
-      );
-      return;
-    }
-
-    const u = usernameInput.trim().toLowerCase();
-    const p = passwordInput.trim();
-
-    if (u === ADMIN_USER.toLowerCase() && p === ADMIN_PASS) {
+    setLoginError('');
+    try {
+      await api.adminLogin(usernameInput.trim(), passwordInput.trim());
       setIsAuthenticated(true);
       sessionStorage.setItem('isAdminAuth', 'true');
-      setLoginError('');
-    } else {
-      setLoginError('Hatalı kullanıcı adı veya şifre.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Giriş başarısız.';
+      setLoginError(msg);
     }
   };
 

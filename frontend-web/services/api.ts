@@ -126,7 +126,14 @@ export const api = {
   delete: <T>(path: string, opts: Omit<RequestInit, 'method'> & { auth?: boolean } = {}) =>
     request<T>(path, { ...opts, method: 'DELETE' }),
 
+  // ── Admin ────────────────────────────────────────────────────────────────
   // ── Auth Convenience ────────────────────────────────────────────────────
+  adminLogin: (username: string, password: string) =>
+    api.post<{ access_token: string; token_type: string }>(
+      '/api/auth/admin/login',
+      { username, password },
+      { auth: false },
+    ),
   login: (payload: LoginRequest) =>
     api.post<TokenResponse>('/api/auth/login', payload, { auth: false }),
   register: (payload: RegisterRequest) =>

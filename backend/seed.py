@@ -125,6 +125,7 @@ def seed_user(
     pharmacy_city: str,
     balance: float = 0.0,
     is_premium: bool = False,
+    is_admin: bool = False,
     rating: float = 9.0,
 ) -> User:
     user = (
@@ -150,6 +151,7 @@ def seed_user(
         balance=balance,
         rating=rating,
         listing_count=0,
+        is_admin=is_admin,
         consent=True,
         privacy=True,
     )
@@ -283,11 +285,18 @@ def seed_demo(db: Session) -> None:
     # 3245676600002 -> valid
     # Demo şifresi env'den alınır; yoksa yalnızca development'ta default kullanılır
     _demo_pwd = os.getenv("SEED_DEMO_PASSWORD", "demo123")
+    # Admin şifresi env'den zorunlu alınır; yoksa güvenli rastgele değer üretilir (giriş yapılamaz)
+    import secrets as _secrets
+    _admin_pwd = os.getenv("SEED_ADMIN_PASSWORD") or _secrets.token_hex(32)
+
     sellers_def = [
-        ("demo", _demo_pwd, "3245676600058", "10000002676", "Kadıköy Şifa Eczanesi (Demo Hesabı)", "Kadıköy / İstanbul", 1450.0, True, 9.5),
+        # (username, password, gln, tc, pharmacy_name, city, balance, is_premium, is_admin, rating)
+        ("demo", _demo_pwd, "3245676600058", "10000002676", "Kadıköy Şifa Eczanesi (Demo Hesabı)", "Kadıköy / İstanbul", 1450.0, True, False, 9.5),
     ]
+    # Admin kullanıcısı — is_admin=True, GLN ve TC placeholder (unique olmalı)
+    admin_def = ("admin", _admin_pwd, "0000000000001", "00000000001", "Sistem Yöneticisi", "İstanbul", 0.0, False, True, 10.0)
     sellers: dict[str, User] = {}
-    for (uname, pwd, gln, tc, pname, pcity, bal, prem, rating) in sellers_def:
+    for (uname, pwd, gln, tc, pname, pcity, bal, prem, is_adm, rating) in sellers_def:
         user = seed_user(
             db,
             username=uname,
@@ -298,11 +307,28 @@ def seed_demo(db: Session) -> None:
             pharmacy_city=pcity,
             balance=bal,
             is_premium=prem,
+            is_admin=is_adm,
             rating=rating,
         )
         sellers[pname] = user
         if uname == "demo":
             sellers["me"] = user
+
+    # Admin kullanıcısını seed et
+    (a_uname, a_pwd, a_gln, a_tc, a_pname, a_pcity, a_bal, a_prem, a_adm, a_rating) = admin_def
+    seed_user(
+        db,
+        username=a_uname,
+        password=a_pwd,
+        gln=a_gln,
+        tc=a_tc,
+        pharmacy_name=a_pname,
+        pharmacy_city=a_pcity,
+        balance=a_bal,
+        is_premium=a_prem,
+        is_admin=a_adm,
+        rating=a_rating,
+    )
     db.commit()
 
     # Reload User dicts — use pharmacy_name as key.

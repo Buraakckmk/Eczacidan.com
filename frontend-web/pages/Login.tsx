@@ -10,8 +10,8 @@ export default function Login() {
   const { login } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState('demo');
-  const [password, setPassword] = useState('demo123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -49,11 +49,10 @@ export default function Login() {
             </p>
           </div>
           <div className="space-y-2 rounded-xl bg-white/10 backdrop-blur p-4 text-xs">
-            <p className="font-bold text-orange-100">Demo Giriş Bilgileri:</p>
-            <p>
-              Kullanıcı: <b>demo</b> / Şifre: <b>demo123</b>
+            <p className="font-bold text-orange-100">Hesabınız yok mu?</p>
+            <p className="text-orange-100/80">
+              Kayıt olmak için GLN numaranızla üye olun.
             </p>
-            <p>veya Kullanıcı: <b>sifa</b> / Şifre: <b>sifa123</b></p>
           </div>
         </div>
 

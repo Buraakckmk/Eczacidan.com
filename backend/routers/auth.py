@@ -93,6 +93,27 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)) -> Registe
     return RegisterResponse(success=True, message="Kayıt başarılı!", user_id=user.id)
 
 
+@router.post("/admin/login", response_model=Token)
+def admin_login(payload: LoginRequest, db: Session = Depends(get_db)) -> Token:
+    """Yönetici paneli girişi — yalnızca is_admin=True olan kullanıcılara izin verir."""
+    user = (
+        db.query(User)
+        .filter(User.username == payload.username.strip())
+        .first()
+    )
+    if not user or not verify_password(payload.password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Hatalı kullanıcı adı veya şifre.",
+        )
+    if not user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Bu hesabın yönetici paneli erişimi bulunmuyor.",
+        )
+    return _make_token(user)
+
+
 @router.post("/login", response_model=Token)
 def login_json(payload: LoginRequest, db: Session = Depends(get_db)) -> Token:
     user = (

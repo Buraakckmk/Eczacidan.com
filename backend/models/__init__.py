@@ -37,6 +37,7 @@ class User(Base):
 
     is_verified = Column(Boolean, default=True)
     is_premium = Column(Boolean, default=False)
+    is_admin = Column(Boolean, default=False)  # Yönetici paneli erişimi
     balance = Column(Float, default=0.0)
     rating = Column(Float, default=8.5)
     listing_count = Column(Integer, default=0)

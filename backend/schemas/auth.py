@@ -48,6 +48,7 @@ class UserResponse(BaseModel):
     phone: str | None = None
     is_verified: bool
     is_premium: bool
+    is_admin: bool = False
     balance: float
     rating: float
     listing_count: int

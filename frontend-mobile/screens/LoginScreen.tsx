@@ -10,8 +10,8 @@ import {
 } from 'react-native';
 
 export function LoginScreen({ navigation }: any) {
-  const [username, setUsername] = useState('demo');
-  const [password, setPassword] = useState('demo123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleLogin = () => {
     if (!username || !password) {
