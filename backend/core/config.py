@@ -32,6 +32,15 @@ DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./eczacidan.db")
 # SQLite bağlantısı için özel argümanlar gerekiyorsa kullanılır
 IS_SQLITE = DATABASE_URL.startswith("sqlite")
 
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "dev-only-secret-change-me-please-123456")
+_JWT_SECRET_DEFAULT = "dev-only-secret-change-me-please-123456"
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", _JWT_SECRET_DEFAULT)
+
+# Üretim ortamında zayıf/varsayılan secret kullanılmasını engelle
+_is_dev = os.getenv("APP_ENV", "development").lower() in ("development", "dev", "local", "test")
+if not _is_dev and JWT_SECRET_KEY == _JWT_SECRET_DEFAULT:
+    raise RuntimeError(
+        "HATA: Üretim ortamında JWT_SECRET_KEY env değişkeni ayarlanmamış! "
+        "Güçlü ve benzersiz bir secret belirleyin: python -c \"import secrets; print(secrets.token_hex(32))\""
+    )
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("JWT_ACCESS_TOKEN_EXPIRE_MINUTES", "1440"))

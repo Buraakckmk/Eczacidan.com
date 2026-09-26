@@ -23,9 +23,10 @@ export const API_BASE_URL = env?.VITE_API_BASE_URL || 'http://localhost:8000';
 
 const TOKEN_KEY = 'eczacidan_auth_token';
 
+// sessionStorage kullanılır: sekme kapanınca token silinir (localStorage XSS riski taşır).
 export function getStoredToken(): string | null {
   try {
-    return typeof window !== 'undefined' ? window.localStorage.getItem(TOKEN_KEY) : null;
+    return typeof window !== 'undefined' ? window.sessionStorage.getItem(TOKEN_KEY) : null;
   } catch {
     return null;
   }
@@ -34,9 +35,9 @@ export function getStoredToken(): string | null {
 export function setStoredToken(token: string | null): void {
   try {
     if (token) {
-      window.localStorage.setItem(TOKEN_KEY, token);
+      window.sessionStorage.setItem(TOKEN_KEY, token);
     } else {
-      window.localStorage.removeItem(TOKEN_KEY);
+      window.sessionStorage.removeItem(TOKEN_KEY);
     }
   } catch {
     // SSR veya gizli mod hatasını sessizce yut

@@ -97,7 +97,7 @@ const CANNED_RESPONSES = [
 export default function AdminPanel() {
   // Authentication State
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
-    () => localStorage.getItem('isAdminAuth') === 'true'
+    () => sessionStorage.getItem('isAdminAuth') === 'true'
   );
   const [usernameInput, setUsernameInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
@@ -271,26 +271,40 @@ export default function AdminPanel() {
   };
 
   // LOGIN HANDLER
+  // Kimlik bilgileri YALNIZCA build zamanında env'den gelir.
+  // .env.local dosyasına VITE_ADMIN_USER ve VITE_ADMIN_PASS ekleyin.
+  // Bu değişkenler bundle'a derlenir; dolayısıyla güçlü, benzersiz değerler kullanın
+  // ve .env.local dosyasını .gitignore'da tutun.
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    const validUsers = ['admin', 'eczacidan', 'yonetici', 'demo'];
-    const validPasswords = ['admin', '123456', 'eczacidan2026', 'demo123'];
+
+    const ADMIN_USER = import.meta.env.VITE_ADMIN_USER as string | undefined;
+    const ADMIN_PASS = import.meta.env.VITE_ADMIN_PASS as string | undefined;
+
+    // Her iki env değişkeni de tanımlı değilse panel tamamen erişilemez olur.
+    if (!ADMIN_USER || !ADMIN_PASS) {
+      setLoginError(
+        'Yönetici paneli yapılandırılmamış. ' +
+        'Lütfen VITE_ADMIN_USER ve VITE_ADMIN_PASS ortam değişkenlerini tanımlayın.'
+      );
+      return;
+    }
 
     const u = usernameInput.trim().toLowerCase();
     const p = passwordInput.trim();
 
-    if (validUsers.includes(u) && validPasswords.includes(p)) {
+    if (u === ADMIN_USER.toLowerCase() && p === ADMIN_PASS) {
       setIsAuthenticated(true);
-      localStorage.setItem('isAdminAuth', 'true');
+      sessionStorage.setItem('isAdminAuth', 'true');
       setLoginError('');
     } else {
-      setLoginError('Hatalı Kullanıcı Adı veya Şifre! Yönetici erişimi engellendi.');
+      setLoginError('Hatalı kullanıcı adı veya şifre.');
     }
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('isAdminAuth');
+    sessionStorage.removeItem('isAdminAuth');
   };
 
   // SEND ADMIN REPLY

@@ -25,22 +25,6 @@ export function useAuth() {
   return ctx;
 }
 
-const DEMO_USER: UserResponse = {
-  id: 1,
-  username: 'demo',
-  gln: '3245676600002',
-  email: 'sifa@eczane.com',
-  pharmacy_name: 'Kadıköy Şifa Eczanesi',
-  pharmacy_city: 'Kadıköy / İstanbul',
-  pharmacy_address: 'Bağdat Cad. No: 142 Kadıköy / İstanbul',
-  phone: '0216 345 67 89',
-  is_verified: true,
-  is_premium: true,
-  balance: 1450.00,
-  rating: 9.8,
-  listing_count: 392,
-};
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(() => getStoredToken());
   const [user, setUser] = useState<UserResponse | null>(null);
@@ -54,9 +38,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const me = await api.me();
       setUser(me);
-    } catch (err) {
-      // Sunucuya erişilemiyorsa veya token eskidiyse demo kullanıcı ile oturum koru
-      setUser(DEMO_USER);
+    } catch {
+      // Token geçersiz veya süresi dolmuş — oturumu temizle
+      setStoredToken(null);
+      setToken(null);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -76,16 +62,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const res = await api.login({ username, password });
       setStoredToken(res.access_token);
       setToken(res.access_token);
-      const me = await api.me().catch(() => ({ ...DEMO_USER, username }));
+      const me = await api.me();
       setUser(me);
     } catch (err) {
-      // Ağ hatası veya backend kapalıysa otomatik demo girişi yap
-      setStoredToken('demo-token-12345');
-      setToken('demo-token-12345');
-      setUser({
-        ...DEMO_USER,
-        username: username || 'demo',
-      });
+      // Giriş başarısız — hatayı yukarı ilet, otomatik demo girişi yapma
+      setStoredToken(null);
+      setToken(null);
+      setUser(null);
+      throw err;
     } finally {
       setIsLoading(false);
     }

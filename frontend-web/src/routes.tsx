@@ -53,10 +53,10 @@ export const router = createBrowserRouter([
   },
   {
     path: '/admin-portal',
-    element: <AdminPanel />,
+    element: <RequireAuth><AdminPanel /></RequireAuth>,
   },
   {
     path: '/sys-admin',
-    element: <AdminPanel />,
+    element: <RequireAuth><AdminPanel /></RequireAuth>,
   },
 ]);

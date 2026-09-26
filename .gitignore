@@ -18,6 +18,10 @@ frontend-web/tsconfig.node.tsbuildinfo
 .env
 .env.*
 !.env.example
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env.local.example
 
 # OS
 .DS_Store

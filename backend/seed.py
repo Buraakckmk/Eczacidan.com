@@ -1,11 +1,12 @@
 """İlk çalıştırmada demo veri (seed) ekler.
 
-Kullanıcı: demo / demo123
+Kullanıcı: demo / (SEED_DEMO_PASSWORD env değişkeni veya geliştirme ortamı için demo123)
 GLN: 3245676600002 (doğru checksum'lu)
 """
 
 from __future__ import annotations
 
+import os
 from datetime import datetime
 
 from sqlalchemy.orm import Session
@@ -280,8 +281,10 @@ def seed_demo(db: Session) -> None:
 
     # Valid GLN: 3 2 4 5 6 7 6 6 0 0 0 0 -> check digit 2
     # 3245676600002 -> valid
+    # Demo şifresi env'den alınır; yoksa yalnızca development'ta default kullanılır
+    _demo_pwd = os.getenv("SEED_DEMO_PASSWORD", "demo123")
     sellers_def = [
-        ("demo", "demo123", "3245676600058", "10000002676", "Kadıköy Şifa Eczanesi (Demo Hesabı)", "Kadıköy / İstanbul", 1450.0, True, 9.5),
+        ("demo", _demo_pwd, "3245676600058", "10000002676", "Kadıköy Şifa Eczanesi (Demo Hesabı)", "Kadıköy / İstanbul", 1450.0, True, 9.5),
     ]
     sellers: dict[str, User] = {}
     for (uname, pwd, gln, tc, pname, pcity, bal, prem, rating) in sellers_def:
